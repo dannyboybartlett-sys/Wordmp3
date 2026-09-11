@@ -1,3 +1,3 @@
 #!/bin/sh
-# Render startup — use gunicorn in production
-exec gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --threads 4
+# Works on both Render (sets $PORT) and Fly.io (sets $PORT)
+exec gunicorn app:app --bind 0.0.0.0:${PORT:-8080} --workers 2 --threads 4

@@ -224,6 +224,7 @@ def api_voices():
 
 # ── Run ─────────────────────────────────────────────────────────
 if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
     _log(f"API key loaded: {'YES' if _api_key else 'NO — enter in Settings'}")
-    _log("Open http://localhost:5000")
-    app.run(host="0.0.0.0", port=5000, debug=False, threaded=True)
+    _log(f"Starting on port {port}")
+    app.run(host="0.0.0.0", port=port, debug=False, threaded=True)
