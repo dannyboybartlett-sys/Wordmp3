@@ -694,7 +694,7 @@
     document.getElementById("genBtn").disabled = true;
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/generate", {
+      const res = await fetch(window.location.origin + "/api/generate", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ words: words.join("\n"), api_key: apiKey, voice_id: voiceId, speed: speed })
@@ -768,7 +768,7 @@
     document.getElementById("voiceGrid").innerHTML = "";
 
     try {
-      const res  = await fetch(`http://127.0.0.1:8000/api/voices?api_key=${encodeURIComponent(apiKey)}`);
+      const res  = await fetch(`${window.location.origin}/api/voices?api_key=${encodeURIComponent(apiKey)}`);
       const data = await res.json();
 
       if (!res.ok || data.error) {
