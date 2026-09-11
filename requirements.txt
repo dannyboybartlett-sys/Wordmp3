@@ -1,0 +1,3 @@
+elevenlabs>=0.60
+flask>=3.0
+gunicorn>=21.0

@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Word MP3 Generator — Teacher Edition</title>
+  <style>
+    /* ── Reset & base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:      #2563EB;
+      --blue-l:    #DBEAFE;
+      --blue-d:    #1D4ED8;
+      --orange:    #F97316;
+      --amber:     #FEF3C7;
+      --green:     #16A34A;
+      --green-l:   #DCFCE7;
+      --red:       #DC2626;
+      --red-l:     #FEE2E2;
+      --dark:      #1C1917;
+      --gray:      #57534E;
+      --mid:       #A8A29E;
+      --border:    #E5E7EB;
+      --bg:        #F8FAFC;
+      --white:     #FFFFFF;
+      --radius:    10px;
+      --shadow:    0 2px 8px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    header {
+      background: var(--blue);
+      color: var(--white);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    header h1 span {
+      background: rgba(255,255,255,0.2);
+      padding: 2px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .header-actions { display: flex; gap: 10px; }
+
+    .btn {
+      padding: 8px 18px;
+      border-radius: var(--radius);
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-ghost {
+      background: rgba(255,255,255,0.18);
+      color: var(--white);
+    }
+
+    .btn-primary {
+      background: var(--orange);
+      color: var(--white);
+      font-size: 16px;
+      padding: 12px 28px;
+    }
+
+    /* ── Main layout ──────────────────────────────────────── */
+    .main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 36px 20px 80px;
+    }
+
+    /* ── Card ─────────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .card-head {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .card-head h2 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .card-body { padding: 20px 24px; }
+
+    /* ── Step badge ───────────────────────────────────────── */
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-badge.done {
+      background: var(--green);
+    }
+
+    .step-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    /* ── Form elements ────────────────────────────────────── */
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray);
+      margin-bottom: 6px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 240px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      font-size: 15px;
+      font-family: "SF Mono", "Fira Code", monospace;
+      color: var(--dark);
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    textarea:focus { border-color: var(--blue); }
+
+    textarea::placeholder { color: var(--mid); }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    input[type="text"], input[type="password"] {
+      flex: 1;
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus { border-color: var(--blue); }
+
+    /* ── Word count ───────────────────────────────────────── */
+    .word-count-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--mid);
+    }
+
+    .wc-track {
+      flex: 1;
+      height: 5px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .wc-fill {
+      height: 100%;
+      background: var(--blue);
+      border-radius: 99px;
+      transition: width 0.3s, background 0.3s;
+    }
+
+    /* ── Buttons row ──────────────────────────────────────── */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Format preview ───────────────────────────────────── */
+    .format-hint {
+      background: var(--blue-l);
+      border: 1px solid #BFDBFE;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--blue-d);
+      line-height: 1.8;
+      font-family: "SF Mono", "Fira Code", monospace;
+      margin-top: 12px;
+    }
+
+    /* ── Status messages ──────────────────────────────────── */
+    .msg {
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      margin-top: 14px;
+      display: none;
+    }
+
+    .msg.show { display: block; }
+
+    .msg-ok    { background: var(--green-l); color: #166534; border: 1px solid #86EFAC; }
+    .msg-err   { background: var(--red-l);   color: #991B1B; border: 1px solid #FCA5A5; }
+    .msg-info  { background: var(--blue-l);  color: var(--blue-d); border: 1px solid #BFDBFE; }
+
+    /* ── Download button ──────────────────────────────────── */
+    .dl-btn {
+      display: none;
+      margin-top: 16px;
+      padding: 14px 28px;
+      background: var(--green);
+      color: var(--white);
+      border-radius: var(--radius);
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: opacity 0.15s, transform 0.1s;
+      width: 100%;
+    }
+
+    .dl-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .dl-btn.show  { display: block; }
+
+    /* ── Loading spinner ──────────────────────────────────── */
+    .spinner {
+      display: none;
+      text-align: center;
+      padding: 24px;
+      font-size: 14px;
+      color: var(--gray);
+    }
+
+    .spinner.show { display: block; }
+
+    .spinner-ring {
+      width: 36px;
+      height: 36px;
+      border: 4px solid var(--border);
+      border-top-color: var(--blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Settings modal ───────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 14px;
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-head {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-head h2 { font-size: 17px; }
+
+    .modal-body { padding: 20px 24px; }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--mid);
+      line-height: 1;
+    }
+
+    .modal-close:hover { color: var(--dark); }
+
+    .form-group { margin-bottom: 16px; }
+
+    .form-group p {
+      font-size: 12px;
+      color: var(--mid);
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+
+    .form-group p a { color: var(--blue); }
+
+    /* Voice list */
+    .voice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .voice-card {
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .voice-card:hover { border-color: var(--blue); background: var(--blue-l); }
+
+    .voice-card.selected {
+      border-color: var(--blue);
+      background: var(--blue-l);
+    }
+
+    .voice-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 3px;
+    }
+
+    .voice-lang {
+      font-size: 11px;
+      color: var(--mid);
+    }
+
+    .voice-play {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--blue);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    /* ── How it works section ─────────────────────────────── */
+    .hiw-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-top: 6px;
+    }
+
+    .hiw-item {
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .hiw-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: var(--white);
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0 auto 8px;
+    }
+
+    .hiw-item p {
+      font-size: 12px;
+      color: var(--gray);
+      line-height: 1.5;
+    }
+
+    /* ── Responsive ───────────────────────────────────────── */
+    @media (max-width: 540px) {
+      .hiw-grid      { grid-template-columns: 1fr; }
+      .voice-grid    { grid-template-columns: 1fr; }
+      .input-row     { flex-direction: column; }
+    }
+
+    /* ── Settings saved notice ────────────────────────────── */
+    .settings-saved {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--green);
+      font-weight: 600;
+    }
+    .settings-saved.show { display: flex; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header>
+  <h1>Word MP3 Generator <span>Teacher Edition</span></h1>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="openSettings()">⚙️ Settings</button>
+  </div>
+</header>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<main class="main">
+
+  <!-- How it works -->
+  <div class="card">
+    <div class="card-body">
+      <div class="hiw-grid">
+        <div class="hiw-item">
+          <div class="hiw-num">1</div>
+          <p>Enter up to 15 words,<br/>one per line</p>
+        </div>
+        <div class="hiw-item">
+          <div class="hiw-num">2</div>
+          <p>Click Generate — the app<br/>reads them 3× each with<br/>2-second pauses</p>
+        </div>
+        <div class="hiw-item">
+          <div class="hiw-num">3</div>
+          <p>Download the MP3<br/>and use it in class!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 1: Enter words -->
+  <div class="card">
+    <div class="card-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="step-badge" id="badge1">1</div>
+        <span class="step-label">Enter your word list</span>
+      </div>
+      <span style="font-size:12px;color:var(--mid)">Max 15 words</span>
+    </div>
+    <div class="card-body">
+      <label for="words">One word per line, e.g.:</label>
+      <textarea
+        id="words"
+        placeholder="dog&#10;cat&#10;elephant&#10;swim&#10;library&#10;homework&#10;..."
+        oninput="updateWordCount()"
+      ></textarea>
+
+      <div class="word-count-bar">
+        <div class="wc-track">
+          <div class="wc-fill" id="wcFill" style="width:0%"></div>
+        </div>
+        <span id="wcText">0 / 15 words</span>
+      </div>
+
+      <div class="format-hint">
+        Output:&nbsp; <strong>Number 1</strong> (2s) → <strong>dog</strong> (3s) → <strong>dog</strong> (3s) → <strong>dog</strong> (6s) → <strong>Number 2</strong> (2s) → <strong>cat</strong> (3s) → <strong>cat</strong> (3s) → <strong>cat</strong> (6s) → …
+      </div>
+
+      <!-- Speed control -->
+      <div style="margin-top:16px">
+        <label for="speedSlider">Speaking speed: <strong id="speedVal">0.8×</strong> &nbsp;<span style="font-size:11px;color:var(--mid)">(slower → faster)</span></label>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+          <span style="font-size:12px;color:var(--mid)">🐢</span>
+          <input type="range" id="speedSlider" min="0.5" max="1.0" step="0.05" value="0.8"
+            style="flex:1;cursor:pointer" oninput="document.getElementById('speedVal').textContent=this.value+'×'" />
+          <span style="font-size:12px;color:var(--mid)">🐇</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" id="genBtn" onclick="generate()">
+          🎙️ Generate MP3
+        </button>
+        <button class="btn btn-ghost" style="background:var(--border);color:var(--dark)" onclick="clearWords()">
+          🗑️ Clear
+        </button>
+      </div>
+
+      <!-- Spinner -->
+      <div class="spinner" id="spinner">
+        <div class="spinner-ring"></div>
+        Generating MP3 — this takes a few seconds per word…
+      </div>
+
+      <!-- Messages -->
+      <div class="msg" id="msgErr"></div>
+      <div class="msg msg-ok" id="msgOk"></div>
+
+      <!-- Download -->
+      <a class="dl-btn" id="dlBtn" href="#" download>⬇️ Download MP3</a>
+    </div>
+  </div>
+
+  <!-- Step 2: How to use -->
+  <div class="card">
+    <div class="card-head">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="step-badge" id="badge2">2</div>
+        <span class="step-label">Use it in class</span>
+      </div>
+    </div>
+    <div class="card-body" style="font-size:14px;color:var(--gray);line-height:1.7">
+      <p>📱 Transfer the MP3 to your phone or tablet.</p>
+      <p>🔁 Students hear each word 3 times — great for listening practice!</p>
+      <p>⏱️ The 2-second pauses give students time to process and repeat after the audio.</p>
+      <p>🔄 Works perfectly for dictation, vocabulary tests, or pronunciation drills.</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════════════════ SETTINGS MODAL ═══════════════════ -->
+<div class="modal-overlay" id="settingsOverlay" onclick="closeOnOverlay(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>⚙️ Settings</h2>
+      <button class="modal-close" onclick="closeSettings()">×</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-group">
+        <label for="apiKey">ElevenLabs API Key</label>
+        <div class="input-row">
+          <input type="password" id="apiKey" placeholder="sk-..." autocomplete="off" />
+          <button class="btn btn-primary" style="padding:9px 16px;background:var(--blue)" onclick="saveSettings()">
+            Save
+          </button>
+        </div>
+        <p>
+          Get your free API key at
+          <a href="https://elevenlabs.io" target="_blank">elevenlabs.io</a>
+          — free tier = 10,000 chars/month.<br/>
+          Your key is stored locally in your browser only and never sent to any server.
+        </p>
+        <div class="settings-saved" id="settingsSaved">
+          ✅ API key saved — now load voices below
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Voice</label>
+        <button class="btn btn-ghost" style="background:var(--border);color:var(--dark);font-size:13px" onclick="loadVoices()">
+          🔊 Load my voices
+        </button>
+        <p style="margin-top:6px">Load voices first, then pick one for the MP3.</p>
+        <div id="voiceLoading" style="display:none;font-size:13px;color:var(--mid);margin-top:6px">
+          Loading voices…
+        </div>
+        <div class="voice-grid" id="voiceGrid"></div>
+        <div id="noVoices" style="display:none;font-size:13px;color:var(--mid);margin-top:8px">
+          No voices found. Make sure your API key is correct.
+        </div>
+      </div>
+
+      <div style="margin-top:20px;padding:14px;background:var(--amber);border-radius:var(--radius);font-size:13px;color:#92400E;line-height:1.6">
+        <strong>Want your own voice?</strong><br/>
+        Record a 2-minute sample at
+        <a href="https://elevenlabs.io/voice-cloning" target="_blank" style="color:#92400E">elevenlabs.io/voice-cloning</a>
+        and upload it — then it will appear in the list above!
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+  // ── State ────────────────────────────────────────────────────
+  let selectedVoiceId = localStorage.getItem("voice_id") || "";
+  let currentDownloadUrl = null;
+
+  // ── Init ─────────────────────────────────────────────────────
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedKey = localStorage.getItem("elevenlabs_key") || "";
+    if (savedKey) document.getElementById("apiKey").value = savedKey;
+    if (selectedVoiceId) {
+      // Try loading voices silently
+      loadVoices(true);
+    }
+  });
+
+  // ── Word count ───────────────────────────────────────────────
+  function updateWordCount() {
+    const raw  = document.getElementById("words").value;
+    const words = raw.split("\n").filter(w => w.trim());
+    const n     = Math.min(words.length, 15);
+    const pct   = (n / 15) * 100;
+    const fill  = document.getElementById("wcFill");
+    fill.style.width = pct + "%";
+    fill.style.background = n > 12 ? "var(--red)" : n > 9 ? "var(--orange)" : "var(--blue)";
+    document.getElementById("wcText").textContent = `${n} / 15 words`;
+  }
+
+  function clearWords() {
+    document.getElementById("words").value = "";
+    updateWordCount();
+    document.getElementById("dlBtn").classList.remove("show");
+    document.getElementById("msgOk").classList.remove("show");
+    document.getElementById("msgErr").classList.remove("show");
+    if (currentDownloadUrl) {
+      URL.revokeObjectURL(currentDownloadUrl);
+      currentDownloadUrl = null;
+    }
+  }
+
+  // ── Generate ─────────────────────────────────────────────────
+  async function generate() {
+    const wordsRaw  = document.getElementById("words").value.trim();
+    const words     = wordsRaw.split("\n").filter(w => w.trim()).slice(0, 15);
+    const apiKey    = (document.getElementById("apiKey").value || localStorage.getItem("elevenlabs_key") || "").trim();
+    const voiceId   = selectedVoiceId || localStorage.getItem("voice_id") || "";
+    const speed     = parseFloat(document.getElementById("speedSlider").value);
+
+    // Hide previous
+    document.getElementById("msgErr").classList.remove("show");
+    document.getElementById("msgOk").classList.remove("show");
+    document.getElementById("dlBtn").classList.remove("show");
+
+    if (!words.length) {
+      showErr("Please enter at least one word.");
+      return;
+    }
+    if (!apiKey) {
+      showErr("Please enter your ElevenLabs API key in Settings first.");
+      return;
+    }
+    if (!voiceId) {
+      showErr("Please select a voice in Settings first.");
+      return;
+    }
+
+    // Show spinner
+    document.getElementById("spinner").classList.add("show");
+    document.getElementById("genBtn").disabled = true;
+
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/generate", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ words: words.join("\n"), api_key: apiKey, voice_id: voiceId, speed: speed })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || "Generation failed.");
+      }
+
+      // Show success
+      document.getElementById("msgOk").textContent =
+        `✅ ${data.word_count} words generated successfully!`;
+      document.getElementById("msgOk").classList.add("show");
+
+      // Show download
+      const dlBtn = document.getElementById("dlBtn");
+      dlBtn.href = data.download_url;
+      dlBtn.classList.add("show");
+      dlBtn.download = "word_list.mp3";
+
+      // Mark step 1 done
+      document.getElementById("badge1").classList.add("done");
+      document.getElementById("badge1").textContent = "✓";
+
+    } catch (err) {
+      showErr(err.message || "Something went wrong. Please try again.");
+    } finally {
+      document.getElementById("spinner").classList.remove("show");
+      document.getElementById("genBtn").disabled = false;
+    }
+  }
+
+  // ── Settings ─────────────────────────────────────────────────
+  function openSettings() {
+    document.getElementById("settingsOverlay").classList.add("open");
+    // Pre-fill key from localStorage
+    document.getElementById("apiKey").value = localStorage.getItem("elevenlabs_key") || "";
+    document.getElementById("settingsSaved").classList.remove("show");
+  }
+
+  function closeSettings() {
+    document.getElementById("settingsOverlay").classList.remove("open");
+  }
+
+  function closeOnOverlay(e) {
+    if (e.target === document.getElementById("settingsOverlay")) closeSettings();
+  }
+
+  function saveSettings() {
+    const key = document.getElementById("apiKey").value.trim();
+    if (!key) { alert("Please enter your API key."); return; }
+    localStorage.setItem("elevenlabs_key", key);
+    document.getElementById("settingsSaved").classList.add("show");
+    // Clear voice selection when key changes
+    selectedVoiceId = "";
+    localStorage.removeItem("voice_id");
+    document.getElementById("voiceGrid").innerHTML = "";
+  }
+
+  async function loadVoices(silent) {
+    const apiKey = (document.getElementById("apiKey").value || localStorage.getItem("elevenlabs_key") || "").trim();
+    if (!apiKey) {
+      if (!silent) alert("Please save your API key first.");
+      return;
+    }
+
+    document.getElementById("voiceLoading").style.display = "block";
+    document.getElementById("noVoices").style.display = "none";
+    document.getElementById("voiceGrid").innerHTML = "";
+
+    try {
+      const res  = await fetch(`http://127.0.0.1:8000/api/voices?api_key=${encodeURIComponent(apiKey)}`);
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        throw new Error(data.error || "Failed to load voices.");
+      }
+
+      const voices = data.voices || [];
+      if (!voices.length) {
+        document.getElementById("noVoices").style.display = "block";
+        return;
+      }
+
+      const grid = document.getElementById("voiceGrid");
+      voices.forEach(v => {
+        const card = document.createElement("div");
+        card.className = "voice-card" + (v.voice_id === selectedVoiceId ? " selected" : "");
+        card.dataset.vid = v.voice_id;
+        card.innerHTML = `
+          <div class="voice-name">${escHtml(v.name)}</div>
+          <div class="voice-lang">${escHtml(v.labels?.accent || v.labels?.language || "—")}</div>
+          ${v.preview ? `<span class="voice-play" onclick="playPreview(event,'${escAttr(v.preview)}')">▶ Preview</span>` : ""}
+        `;
+        card.onclick = () => selectVoice(v.voice_id, v.name);
+        grid.appendChild(card);
+      });
+
+    } catch (err) {
+      if (!silent) alert("Could not load voices: " + err.message);
+    } finally {
+      document.getElementById("voiceLoading").style.display = "none";
+    }
+  }
+
+  function selectVoice(id, name) {
+    selectedVoiceId = id;
+    localStorage.setItem("voice_id", id);
+    document.querySelectorAll(".voice-card").forEach(c => {
+      c.classList.toggle("selected", c.dataset.vid === id);
+    });
+    closeSettings();
+  }
+
+  function playPreview(e, url) {
+    e.stopPropagation();
+    new Audio(url).play();
+  }
+
+  // ── Helpers ──────────────────────────────────────────────────
+  function showErr(msg) {
+    const el = document.getElementById("msgErr");
+    el.textContent = msg;
+    el.classList.add("show");
+  }
+
+  function escHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function escAttr(s) {
+    return String(s).replace(/'/g, "\\'").replace(/"/g, "&quot;");
+  }
+</script>
+
+</body>
+</html>
